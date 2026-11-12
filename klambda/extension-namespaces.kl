@@ -1,0 +1,93 @@
+"Copyright (c) 2026 Bruno Deferrari. All rights reserved.
+BSD 3-Clause License: http://opensource.org/licenses/BSD-3-Clause"
+
+(defun shen.x.namespaces.initialise () (do (shen.x.namespaces.handlers shen.x.namespaces.*syntax-handlers*) (do (shen.x.namespaces.handlers shen.x.namespaces.*definition-handlers*) (shen.register-source-form shen.x.namespace (lambda Z7669 (shen.x.namespaces.expand Z7669))))))
+
+(defun shen.x.namespaces.handlers (V7670) (trap-error (value V7670) (lambda Z7671 (set V7670 ()))))
+
+(defun shen.x.namespaces.register-syntax (V7672 V7673) (shen.x.namespaces.register V7672 V7673 shen.x.namespaces.*syntax-handlers*))
+
+(defun shen.x.namespaces.unregister-syntax (V7674) (shen.x.namespaces.unregister V7674 shen.x.namespaces.*syntax-handlers*))
+
+(defun shen.x.namespaces.register-definitions (V7675 V7676) (shen.x.namespaces.register V7675 V7676 shen.x.namespaces.*definition-handlers*))
+
+(defun shen.x.namespaces.unregister-definitions (V7677) (shen.x.namespaces.unregister V7677 shen.x.namespaces.*definition-handlers*))
+
+(defun shen.x.namespaces.register (V7682 V7683 V7684) (cond ((shen.x.namespaces.name? V7682) (do (set V7684 (shen.update-assoc V7682 V7683 (shen.x.namespaces.handlers V7684))) V7682)) (true (simple-error (cn "invalid namespace syntax head: " (shen.app V7682 "
+" shen.s))))))
+
+(defun shen.x.namespaces.unregister (V7685 V7686) (do (set V7686 (remove (assoc V7685 (shen.x.namespaces.handlers V7686)) (shen.x.namespaces.handlers V7686))) V7685))
+
+(defun shen.x.namespaces.syntax-arguments (V7687 V7688) (let W7689 (assoc V7687 (value shen.x.namespaces.*syntax-handlers*)) (if (empty? W7689) V7688 (let W7690 (tl W7689) (shen.x.namespaces.syntax-tail V7687 (W7690 (cons V7687 V7688)))))))
+
+(defun shen.x.namespaces.syntax-tail (V7692 V7693) (cond ((and (cons? V7693) (and (= V7692 (hd V7693)) (shen.source-form-list? (tl V7693)))) (tl V7693)) (true (simple-error (cn "namespace syntax handler for " (shen.app V7692 (cn " must preserve its head and return a proper form: " (shen.app V7693 "
+" shen.s)) shen.s))))))
+
+(defun shen.x.namespaces.check-introduced (V7696 V7697 V7698 V7699) (cond ((tuple? V7699) (let W7700 (assoc V7696 (value shen.x.namespaces.*definition-handlers*)) (if (empty? W7700) shen.x.namespaces.skip (let W7701 (tl W7700) (shen.x.namespaces.check-names (shen.x.namespaces.external-symbols (W7701 (cons V7696 V7697))) V7698 (snd V7699)))))) (true (shen.f-error shen.x.namespaces.check-introduced))))
+
+(defun shen.x.namespaces.check-names (V7706 V7707 V7708) (cond ((= () V7706) shen.x.namespaces.skip) ((cons? V7706) (if (shen.x.namespaces.imported? (hd V7706) V7707 V7708) (simple-error (shen.app (hd V7706) " is imported and cannot be defined here
+" shen.s)) (shen.x.namespaces.check-names (tl V7706) V7707 V7708))) (true (shen.f-error shen.x.namespaces.check-names))))
+
+(defun shen.x.namespaces.expand (V7709) (cond ((and (cons? V7709) (and (= shen.x.namespace (hd V7709)) (and (cons? (tl V7709)) (shen.x.namespaces.name? (hd (tl V7709)))))) (shen.x.namespaces.header (hd (tl V7709)) (tl (tl V7709)) () () () ())) (true (simple-error (cn "invalid namespace: " (shen.app V7709 "
+" shen.s))))))
+
+(defun shen.x.namespaces.header (V7716 V7717 V7718 V7719 V7720 V7721) (cond ((and (cons? V7717) (and (cons? (hd V7717)) (and (= use (hd (hd V7717))) (and (cons? (tl (hd V7717))) (= () (tl (tl (hd V7717)))))))) (shen.x.namespaces.header V7716 (tl V7717) (shen.x.namespaces.add-use (hd (tl (hd V7717))) (hd (tl (hd V7717))) V7718) V7719 V7720 V7721)) ((and (cons? V7717) (and (cons? (hd V7717)) (and (= use (hd (hd V7717))) (and (cons? (tl (hd V7717))) (and (cons? (tl (tl (hd V7717)))) (and (= => (hd (tl (tl (hd V7717))))) (and (cons? (tl (tl (tl (hd V7717))))) (= () (tl (tl (tl (tl (hd V7717))))))))))))) (shen.x.namespaces.header V7716 (tl V7717) (shen.x.namespaces.add-use (hd (tl (hd V7717))) (hd (tl (tl (tl (hd V7717))))) V7718) V7719 V7720 V7721)) ((and (cons? V7717) (and (cons? (hd V7717)) (and (= import (hd (hd V7717))) (and (cons? (tl (hd V7717))) (shen.x.namespaces.name? (hd (tl (hd V7717)))))))) (shen.x.namespaces.header V7716 (tl V7717) V7718 (shen.x.namespaces.add-imports (shen.x.namespaces.imports (hd (tl (hd V7717))) (shen.x.namespaces.renames (tl (tl (hd V7717))))) V7719) V7720 V7721)) ((and (cons? V7717) (and (cons? (hd V7717)) (= shadow (hd (hd V7717))))) (shen.x.namespaces.header V7716 (tl V7717) V7718 (shen.x.namespaces.add-imports (shen.x.namespaces.shadows (str V7716) (tl (hd V7717))) V7719) V7720 V7721)) ((and (cons? V7717) (and (cons? (hd V7717)) (= export (hd (hd V7717))))) (shen.x.namespaces.header V7716 (tl V7717) V7718 V7719 (append V7720 (shen.x.namespaces.renames (tl (hd V7717)))) V7721)) ((and (cons? V7717) (and (cons? (hd V7717)) (and (= externals (hd (hd V7717))) (and (cons? (tl (hd V7717))) (= () (tl (tl (hd V7717)))))))) (shen.x.namespaces.header V7716 (tl V7717) V7718 V7719 V7720 (union (shen.x.namespaces.external-symbols (eval (hd (tl (hd V7717))))) V7721))) ((and (cons? V7717) (and (cons? (hd V7717)) (shen.x.namespaces.directive? (hd (hd V7717))))) (simple-error (cn "invalid namespace directive: " (shen.app (hd V7717) "
+" shen.s)))) (true (let W7722 (str V7716) (let W7723 (@p V7718 V7719) (let W7724 (shen.x.namespaces.body-forms V7717) (let W7725 (do (shen.x.namespaces.check-imports V7719 V7721) (shen.x.namespaces.check-definitions W7724 W7722 V7719 V7721)) (let W7726 (shen.x.namespaces.publish V7716 (shen.x.namespaces.published V7720 W7722 W7723 V7721)) (let W7727 (shen.x.namespaces.qualify-list W7724 W7722 W7723 V7721) (do (shen.record-external V7716 V7721) (do (shen.record-internal V7716 () (snd W7727)) (fst W7727))))))))))))
+
+(defun shen.x.namespaces.directive? (V7728) (element? V7728 (cons use (cons import (cons export (cons shadow (cons externals ())))))))
+
+(defun shen.x.namespaces.add-use (V7731 V7732 V7733) (cond ((and (shen.x.namespaces.name? V7731) (and (shen.x.namespaces.name? V7732) (empty? (assoc V7732 V7733)))) (cons (cons V7732 V7731) V7733)) (true (simple-error (cn "invalid or duplicate namespace use: " (shen.app V7731 (cn " => " (shen.app V7732 "
+" shen.s)) shen.s))))))
+
+(defun shen.x.namespaces.renames (V7734) (cond ((= () V7734) ()) ((and (cons? V7734) (and (cons? (tl V7734)) (and (= => (hd (tl V7734))) (and (cons? (tl (tl V7734))) (and (shen.x.namespaces.name? (hd V7734)) (shen.x.namespaces.name? (hd (tl (tl V7734))))))))) (cons (cons (hd V7734) (hd (tl (tl V7734)))) (shen.x.namespaces.renames (tl (tl (tl V7734)))))) ((and (cons? V7734) (and (shen.x.namespaces.name? (hd V7734)) (not (= (hd V7734) =>)))) (cons (cons (hd V7734) (hd V7734)) (shen.x.namespaces.renames (tl V7734)))) (true (simple-error (cn "invalid namespace names: " (shen.app V7734 "
+" shen.s))))))
+
+(defun shen.x.namespaces.imports (V7737 V7738) (cond ((= () V7738) ()) ((and (cons? V7738) (cons? (hd V7738))) (cons (cons (tl (hd V7738)) (shen.x.namespaces.exported V7737 (hd (hd V7738)))) (shen.x.namespaces.imports V7737 (tl V7738)))) (true (shen.f-error shen.x.namespaces.imports))))
+
+(defun shen.x.namespaces.shadows (V7743 V7744) (cond ((= () V7744) ()) ((and (cons? V7744) (shen.x.namespaces.name? (hd V7744))) (cons (cons (hd V7744) (shen.intern-in-package V7743 (hd V7744))) (shen.x.namespaces.shadows V7743 (tl V7744)))) (true (simple-error (cn "invalid namespace names: " (shen.app V7744 "
+" shen.s))))))
+
+(defun shen.x.namespaces.add-imports (V7751 V7752) (cond ((= () V7751) V7752) ((and (cons? V7751) (and (cons? (hd V7751)) (empty? (assoc (hd (hd V7751)) V7752)))) (shen.x.namespaces.add-imports (tl V7751) (cons (hd V7751) V7752))) ((and (cons? V7751) (cons? (hd V7751))) (simple-error (shen.app (hd (hd V7751)) " is imported or shadowed twice
+" shen.s))) (true (shen.f-error shen.x.namespaces.add-imports))))
+
+(defun shen.x.namespaces.check-imports (V7759 V7760) (cond ((= () V7759) shen.x.namespaces.skip) ((and (cons? V7759) (and (cons? (hd V7759)) (element? (hd (hd V7759)) V7760))) (simple-error (shen.app (hd (hd V7759)) " is both external and imported
+" shen.s))) ((cons? V7759) (shen.x.namespaces.check-imports (tl V7759) V7760)) (true (shen.f-error shen.x.namespaces.check-imports))))
+
+(defun shen.x.namespaces.check-definitions (V7775 V7776 V7777 V7778) (cond ((= () V7775) shen.x.namespaces.skip) ((and (cons? V7775) (and (cons? (hd V7775)) (and (= datatype (hd (hd V7775))) (and (cons? (tl (hd V7775))) (and (shen.sysfunc? (hd (tl (hd V7775)))) (and (not (element? (hd (tl (hd V7775))) V7778)) (empty? (assoc (hd (tl (hd V7775))) V7777)))))))) (simple-error (cn "datatype label " (shen.app (hd (tl (hd V7775))) " is a system name: shadow it
+" shen.s)))) ((and (cons? V7775) (and (cons? (hd V7775)) (and (cons? (tl (hd V7775))) (and (element? (hd (hd V7775)) (cons define (cons defmacro (cons defprolog (cons defcc (cons datatype ())))))) (shen.x.namespaces.imported? (hd (tl (hd V7775))) V7776 V7777))))) (simple-error (shen.app (hd (tl (hd V7775))) " is imported and cannot be defined here
+" shen.s))) ((cons? V7775) (shen.x.namespaces.check-definitions (tl V7775) V7776 V7777 V7778)) (true (shen.f-error shen.x.namespaces.check-definitions))))
+
+(defun shen.x.namespaces.imported? (V7779 V7780 V7781) (let W7782 (assoc V7779 V7781) (and (cons? W7782) (not (= (tl W7782) (shen.intern-in-package V7780 V7779))))))
+
+(defun shen.x.namespaces.body-forms (V7785) (cond ((and (cons? V7785) (and (cons? (hd V7785)) (shen.x.namespaces.directive? (hd (hd V7785))))) (simple-error (cn "namespace directive after body: " (shen.app (hd (hd V7785)) "
+" shen.s)))) ((cons? V7785) (cons (hd V7785) (shen.x.namespaces.body-forms (tl V7785)))) ((= () V7785) ()) (true (shen.f-error shen.x.namespaces.body-forms))))
+
+(defun shen.x.namespaces.name? (V7786) (and (symbol? V7786) (not (variable? V7786))))
+
+(defun shen.x.namespaces.external-symbols (V7787) (cond ((= () V7787) ()) ((and (cons? V7787) (shen.x.namespaces.name? (hd V7787))) (cons (hd V7787) (shen.x.namespaces.external-symbols (tl V7787)))) (true (simple-error (cn "externals expects a list of non-variable symbols: " (shen.app V7787 "
+" shen.s))))))
+
+(defun shen.x.namespaces.interface (V7788) (trap-error (get V7788 shen.x.namespaces.exports (value *property-vector*)) (lambda Z7789 ())))
+
+(defun shen.x.namespaces.exported (V7790 V7791) (let W7792 (shen.x.namespaces.interface V7790) (let W7793 (assoc V7791 W7792) (if (cons? W7793) (tl W7793) (if (empty? W7792) (shen.intern-in-package (str V7790) V7791) (simple-error (shen.app V7790 (cn " does not export " (shen.app V7791 "
+" shen.a)) shen.a)))))))
+
+(defun shen.x.namespaces.published (V7802 V7803 V7804 V7805) (cond ((= () V7802) ()) ((and (cons? V7802) (and (cons? (hd V7802)) (and (= (hd (hd V7802)) (tl (hd V7802))) (shen.x.namespaces.through-use? (tl (hd V7802)) V7803 V7804 V7805)))) (simple-error (cn "export " (shen.app (tl (hd V7802)) (cn " needs a name of its own: " (shen.app (tl (hd V7802)) " => Name
+" shen.s)) shen.s)))) ((and (cons? V7802) (cons? (hd V7802))) (cons (cons (tl (hd V7802)) (fst (shen.x.namespaces.qualify (hd (hd V7802)) V7803 V7804 V7805))) (shen.x.namespaces.published (tl V7802) V7803 V7804 V7805))) (true (shen.f-error shen.x.namespaces.published))))
+
+(defun shen.x.namespaces.through-use? (V7806 V7807 V7808 V7809) (cond ((tuple? V7808) (and (shen.internal? V7806 V7807 V7809) (and (empty? (assoc V7806 (snd V7808))) (cons? (shen.x.namespaces.use-name V7806 (fst V7808)))))) (true (shen.f-error shen.x.namespaces.through-use?))))
+
+(defun shen.x.namespaces.publish (V7812 V7813) (cond ((= () V7813) shen.x.namespaces.skip) (true (put V7812 shen.x.namespaces.exports (shen.x.namespaces.merge-exports V7813 (shen.x.namespaces.interface V7812)) (value *property-vector*)))))
+
+(defun shen.x.namespaces.merge-exports (V7816 V7817) (cond ((= () V7816) V7817) ((and (cons? V7816) (element? (hd V7816) V7817)) (shen.x.namespaces.merge-exports (tl V7816) V7817)) ((and (cons? V7816) (and (cons? (hd V7816)) (cons? (assoc (hd (hd V7816)) V7817)))) (simple-error (shen.app (hd (hd V7816)) " is already exported as something else
+" shen.s))) ((cons? V7816) (shen.x.namespaces.merge-exports (tl V7816) (cons (hd V7816) V7817))) (true (shen.f-error shen.x.namespaces.merge-exports))))
+
+(defun shen.x.namespaces.qualify (V7839 V7840 V7841 V7842) (cond ((and (cons? V7839) (and (= protect (hd V7839)) (and (cons? (tl V7839)) (= () (tl (tl V7839)))))) (@p V7839 ())) ((and (cons? V7839) (and (= with-externals (hd V7839)) (and (cons? (tl V7839)) (and (cons? (tl (tl V7839))) (= () (tl (tl (tl V7839)))))))) (shen.x.namespaces.qualify (hd (tl (tl V7839))) V7840 V7841 (union (shen.x.namespaces.external-symbols (eval (hd (tl V7839)))) V7842))) ((and (cons? V7839) (= with-externals (hd V7839))) (simple-error (cn "invalid with-externals: " (shen.app (tl V7839) "
+" shen.s)))) ((cons? V7839) (let W7843 (shen.x.namespaces.qualify (hd V7839) V7840 V7841 V7842) (let W7844 (shen.x.namespaces.check-introduced (fst W7843) (tl V7839) V7840 V7841) (let W7845 (shen.x.namespaces.syntax-arguments (fst W7843) (tl V7839)) (let W7846 (shen.x.namespaces.qualify-list W7845 V7840 V7841 V7842) (@p (cons (fst W7843) (fst W7846)) (union (snd W7843) (snd W7846)))))))) ((and (tuple? V7841) (and (cons? (assoc V7839 (snd V7841))) (not (element? V7839 V7842)))) (@p (tl (assoc V7839 (snd V7841))) ())) ((and (tuple? V7841) (shen.internal? V7839 V7840 V7842)) (let W7847 (shen.x.namespaces.use-name V7839 (fst V7841)) (if (cons? W7847) (@p (shen.x.namespaces.exported (hd (tl W7847)) (intern (tl (tl W7847)))) ()) (@p (shen.intern-in-package V7840 V7839) (cons V7839 ()))))) (true (@p V7839 ()))))
+
+(defun shen.x.namespaces.qualify-list (V7848 V7849 V7850 V7851) (cond ((cons? V7848) (let W7852 (shen.x.namespaces.qualify (hd V7848) V7849 V7850 V7851) (let W7853 (shen.x.namespaces.qualify-list (tl V7848) V7849 V7850 V7851) (@p (cons (fst W7852) (fst W7853)) (union (snd W7852) (snd W7853)))))) (true (shen.x.namespaces.qualify V7848 V7849 V7850 V7851))))
+
+(defun shen.x.namespaces.use-name (V7856 V7857) (cond ((= () V7857) ()) ((and (cons? V7857) (cons? (hd V7857))) (let W7858 (shen.x.namespaces.use-name V7856 (tl V7857)) (let W7859 (shen.x.namespaces.member-after (str (hd (hd V7857))) (str V7856)) (if (and (string? W7859) (or (empty? W7858) (shen.internal-to-P? (str (hd W7858)) (str (hd (hd V7857)))))) (cons (hd (hd V7857)) (cons (tl (hd V7857)) W7859)) W7858)))) (true (shen.f-error shen.x.namespaces.use-name))))
+
+(defun shen.x.namespaces.member-after (V7865 V7866) (cond ((and (= "" V7865) (and (shen.+string? V7866) (and (= "." (hdstr V7866)) (not (= (tlstr V7866) ""))))) (tlstr V7866)) ((and (shen.+string? V7865) (and (shen.+string? V7866) (= (hdstr V7865) (hdstr V7866)))) (shen.x.namespaces.member-after (tlstr V7865) (tlstr V7866))) (true false)))
+
