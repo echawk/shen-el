@@ -17,10 +17,10 @@ compile:
 
 # Kernel test suite from the kernel/ submodule.
 test:
-	cd kernel/tests && yes n | ../../bin/shen eval -l runme.shen
+	cd kernel/tests && yes n | ../../bin/shen-elisp eval -l runme.shen
 
 test-extensions:
-	cd kernel && yes n | ../bin/shen eval -l tests/extensions/runme.shen
+	cd kernel && yes n | ../bin/shen-elisp eval -l tests/extensions/runme.shen
 
 # Regenerate klambda/ from kernel/ sources: make klambda SHEN=/path/to/shen
 klambda:

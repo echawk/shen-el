@@ -87,10 +87,10 @@ Inside Emacs, `output` and `print` go to `standard-output` (the echo area or
 ## Command line
 
 ```sh
-bin/shen                        # REPL
-bin/shen eval -e '(+ 1 2)'
-bin/shen script file.shen
-bin/shen --help
+bin/shen-elisp                        # REPL
+bin/shen-elisp eval -e '(+ 1 2)'
+bin/shen-elisp script file.shen
+bin/shen-elisp --help
 ```
 
 Leave the REPL with `(shen-elisp.exit)`; `(shen-elisp.exit N)` sets the exit
