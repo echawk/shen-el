@@ -29,7 +29,7 @@ There is no interpreter or trampoline at run time.
 
 ```sh
 git clone --recurse-submodules <repo> shen-elisp
-cd shen-elisp
+cd shen-el
 make            # klambda -> compiled/*.el, then byte + native compile
 make test       # kernel test suite (kernel/tests/runme.shen)
 ```
@@ -44,8 +44,8 @@ make klambda SHEN=/path/to/shen
 ## Loading it with use-package
 
 ```elisp
-(use-package shen-elisp
-  :load-path "~/src/shen-elisp/src"
+(use-package shen-el
+  :load-path "~/src/shen-el/src"
   :commands (shen-repl shen-elisp-eval shen-elisp-eval-region shen-elisp-load-file)
   :custom
   (shen-elisp-max-lisp-eval-depth 200000))
@@ -87,10 +87,10 @@ Inside Emacs, `output` and `print` go to `standard-output` (the echo area or
 ## Command line
 
 ```sh
-bin/shen-elisp                        # REPL
-bin/shen-elisp eval -e '(+ 1 2)'
-bin/shen-elisp script file.shen
-bin/shen-elisp --help
+bin/shen-el                        # REPL
+bin/shen-el eval -e '(+ 1 2)'
+bin/shen-el script file.shen
+bin/shen-el --help
 ```
 
 Leave the REPL with `(shen-elisp.exit)`; `(shen-elisp.exit N)` sets the exit
