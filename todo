@@ -1,0 +1,24 @@
+(do not track this in git)
+
+- finish rename to `shen-el`; ie bulk rename function defintions and move files
+  accordingly; prevents people from being confused about the relation of this repo to `deech/shen-elisp`
+
+- add a real `shen-mode` for editing shen programs; we have a full shen impl
+  so we can easily construct syntax highlighting, flymake issues, etc all via
+  running through actual emacs.
+
+- also, ensure that we can install via using `:vc` use-package keyword in modern
+  emacs; also, we should see what all would be needed to have this package work w/ melpa
+
+ie below does not yet appear to work, though theoretically it should; perhaps we need
+a custom make target?
+```
+(setq package-vc-allow-build-commands t)
+
+(use-package shen-el
+  :vc (:url "https://github.com/echawk/shen-el"
+       :make "all")
+  :commands (shen-repl shen-elisp-eval shen-elisp-eval-region shen-elisp-load-file)
+  :custom
+  (shen-elisp-max-lisp-eval-depth 200000))
+```
