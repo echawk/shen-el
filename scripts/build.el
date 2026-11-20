@@ -24,7 +24,7 @@
 
 (require 'bytecomp)
 (require 'comp nil t)
-(require 'shen-elisp-compiler)
+(require 'shen-el-compiler)
 
 (setq max-lisp-eval-depth 20000)
 
