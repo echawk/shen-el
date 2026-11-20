@@ -1,4 +1,4 @@
-;;; shen-elisp-overwrite.el --- Native replacements for kernel functions  -*- lexical-binding: t; -*-
+;;; shen-el-overwrite.el --- Native replacements for kernel functions  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2026 Ethan Hawk
 ;; SPDX-License-Identifier: BSD-3-Clause
@@ -177,4 +177,4 @@
 
 (provide 'shen-el-overwrite)
 
-;;; shen-elisp-overwrite.el ends here
+;;; shen-el-overwrite.el ends here

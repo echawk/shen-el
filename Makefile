@@ -1,7 +1,7 @@
 EMACS ?= emacs
 BATCH = $(EMACS) -Q --batch -l scripts/build.el
 
-.PHONY: all build translate compile test test-extensions klambda clean
+.PHONY: all build translate compile test test-elisp test-shen test-extensions klambda clean
 
 all: build
 
@@ -16,7 +16,12 @@ compile:
 	$(BATCH) -f shen-elisp-build-compile
 
 # Kernel test suite from the kernel/ submodule.
-test:
+test: test-elisp test-shen
+
+test-elisp: build
+	$(EMACS) -Q --batch -l test/run-tests.el
+
+test-shen: build
 	cd kernel/tests && yes n | ../../bin/shen-el eval -l runme.shen
 
 test-extensions:

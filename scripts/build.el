@@ -62,11 +62,11 @@
 (defun shen-elisp-build--sources ()
   (append
    (mapcar (lambda (f) (shen-elisp-build--path "src" f ".el"))
-           '("shen-elisp-compiler" "shen-elisp-primitives"))
+           '("shen-el-compiler" "shen-el-primitives"))
    (mapcar (lambda (f) (shen-elisp-build--path "compiled" (concat "shen-kernel-" f) ".el"))
            shen-elisp-build-kernel-files)
    (mapcar (lambda (f) (shen-elisp-build--path "src" f ".el"))
-           '("shen-elisp-overwrite" "shen-elisp"))))
+           '("shen-el-overwrite" "shen-el"))))
 
 (defun shen-elisp-build-compile ()
   "Byte-compile, and if possible native-compile, the sources."

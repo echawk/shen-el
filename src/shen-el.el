@@ -1,4 +1,4 @@
-;;; shen-elisp.el --- Shen for Emacs Lisp  -*- lexical-binding: t; -*-
+;;; shen-el.el --- Shen for Emacs Lisp  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2026 Ethan Hawk
 ;; SPDX-License-Identifier: BSD-3-Clause
@@ -13,7 +13,7 @@
 
 ;; Shen (https://shenlanguage.org) running natively in Emacs.  The Shen
 ;; kernel is compiled from KLambda into ordinary Emacs Lisp by
-;; `shen-elisp-compiler.el'; this file loads it, initialises it, and
+;; `shen-el-compiler.el'; this file loads it, initialises it, and
 ;; provides the command-line launcher, an interactive REPL (`shen-repl')
 ;; and an Emacs Lisp API (`shen-elisp-eval-string').
 
@@ -187,6 +187,6 @@ Shen relies on deep recursion; Emacs's default is far too small."
   (let ((max-lisp-eval-depth (max max-lisp-eval-depth shen-elisp-max-lisp-eval-depth)))
     (shen/load (expand-file-name file))))
 
-(provide 'shen-elisp)
+(provide 'shen-el)
 
-;;; shen-elisp.el ends here
+;;; shen-el.el ends here

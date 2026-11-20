@@ -1,4 +1,4 @@
-;;; shen-elisp-primitives.el --- KLambda primitives for Shen/Elisp  -*- lexical-binding: t; -*-
+;;; shen-el-primitives.el --- KLambda primitives for Shen/Elisp  -*- lexical-binding: t; -*-
 
 ;; Copyright (c) 2026 Ethan Hawk
 ;; SPDX-License-Identifier: BSD-3-Clause
@@ -6,7 +6,7 @@
 ;;; Commentary:
 
 ;; The KL primitive instruction set, in the representation used by the
-;; compiler in `shen-elisp-compiler.el':
+;; compiler in `shen-el-compiler.el':
 ;;
 ;;   Shen            Emacs Lisp
 ;;   ----            ----------
@@ -548,4 +548,4 @@ stream passes strings to WRITER, or collects CHUNKS until it is closed."
 
 (provide 'shen-el-primitives)
 
-;;; shen-elisp-primitives.el ends here
+;;; shen-el-primitives.el ends here

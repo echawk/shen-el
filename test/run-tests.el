@@ -9,6 +9,7 @@
 (add-to-list 'load-path
  (expand-file-name "../src" (file-name-directory load-file-name)))
 (require 'shen-mode)
+(require 'shen-el)
 (require 'ert)
 
 (with-temp-buffer

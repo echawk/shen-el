@@ -1,4 +1,4 @@
 #!/bin/sh
 # Shen/Elisp command-line launcher: shen [repl|eval|script|--help|--version] ...
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-exec "${EMACS:-emacs}" -Q --batch -L "$ROOT/src" -l shen-elisp -f shen-elisp-main -- "$@"
+exec "${EMACS:-emacs}" -Q --batch -L "$ROOT/src" -l shen-el -f shen-elisp-main -- "$@"

@@ -18,20 +18,20 @@ There is no interpreter or trampoline at run time.
 |---|---|
 | `kernel/` | Git submodule: [Shen-Language/shen-sources](https://github.com/Shen-Language/shen-sources) @ `shen-43.6` |
 | `klambda/` | KL generated from `kernel/` (`make klambda SHEN=...`); `klambda/SOURCE` records the commit |
-| `src/shen-elisp-compiler.el` | KL reader and KL → Emacs Lisp compiler |
-| `src/shen-elisp-primitives.el` | KL primitives and runtime |
-| `src/shen-elisp-overwrite.el` | Native replacements for hot kernel functions |
-| `src/shen-elisp.el` | Boot, launcher, Emacs commands |
+| `src/shen-el-compiler.el` | KL reader and KL → Emacs Lisp compiler |
+| `src/shen-el-primitives.el` | KL primitives and runtime |
+| `src/shen-el-overwrite.el` | Native replacements for hot kernel functions |
+| `src/shen-el.el` | Boot, launcher, Emacs commands |
 | `compiled/` | Generated kernel `.el`/`.elc` (build output) |
-| `bin/shen` | Command-line launcher |
+| `bin/shen-el` | Command-line launcher |
 
 ## Building
 
 ```sh
-git clone --recurse-submodules <repo> shen-elisp
+git clone --recurse-submodules <repo> shen-el
 cd shen-el
 make            # klambda -> compiled/*.el, then byte + native compile
-make test       # kernel test suite (kernel/tests/runme.shen)
+make test       # Emacs Lisp and Shen kernel test suites
 ```
 
 `SHEN_ELISP_NATIVE=0 make` skips native compilation. The build needs only
