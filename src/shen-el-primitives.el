@@ -29,7 +29,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'shen-elisp-compiler)
+(require 'shen-el-compiler)
 
 (define-error 'shen-error "Shen error")
 
@@ -546,6 +546,6 @@ stream passes strings to WRITER, or collects CHUNKS until it is closed."
  (thaw (f) (funcall f))
  (freeze (x) (lambda () x)))
 
-(provide 'shen-elisp-primitives)
+(provide 'shen-el-primitives)
 
 ;;; shen-elisp-primitives.el ends here

@@ -781,6 +781,6 @@ inserted after the `require' of the runtime."
       (insert (format ";;; %s ends here\n" base)))
     target))
 
-(provide 'shen-elisp-compiler)
+(provide 'shen-el-compiler)
 
 ;;; shen-elisp-compiler.el ends here

@@ -14,7 +14,7 @@
 
 ;;; Code:
 
-(require 'shen-elisp-primitives)
+(require 'shen-el-primitives)
 
 (defvar shen/*property-vector*)
 (defvar shen/*hush*)
@@ -175,6 +175,6 @@
       'true
     (funcall shen-elisp--kernel-shen-call? symbol)))
 
-(provide 'shen-elisp-overwrite)
+(provide 'shen-el-overwrite)
 
 ;;; shen-elisp-overwrite.el ends here

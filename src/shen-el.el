@@ -20,7 +20,7 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'shen-elisp-primitives)
+(require 'shen-el-primitives)
 
 (defgroup shen-elisp nil
   "Shen for Emacs Lisp."
@@ -105,7 +105,7 @@ Shen relies on deep recursion; Emacs's default is far too small."
       (add-to-list 'load-path compiled)
       (dolist (file shen-elisp-kernel-files)
         (require (intern (concat "shen-kernel-" file))))
-      (require 'shen-elisp-overwrite)
+      (require 'shen-el-overwrite)
       (setq shen/*language* "Emacs Lisp"
             shen/*implementation* "GNU Emacs"
             shen/*release* emacs-version
