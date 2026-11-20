@@ -208,6 +208,35 @@ Returns (PREFIX . CANDIDATES) or nil when the CAPF refuses."
       (should (numberp result))
       (should (= result 42)))))
 
+(ert-deftest shen-font-lock-respects-form-position ()
+  "Definition words used as list data do not become keywords."
+  (with-current-buffer (shen-test--buffer
+                        "(package p [] (define foo X -> X)) [define foo | Bar]")
+    (font-lock-mode 1)
+    (font-lock-fontify-buffer)
+    (goto-char (point-min))
+    (search-forward "define")
+    (should (eq (get-text-property (match-beginning 0) 'face)
+                'font-lock-keyword-face))
+    (search-forward "foo")
+    (should (eq (get-text-property (match-beginning 0) 'face)
+                'font-lock-function-name-face))
+    (search-forward "define")
+    (should-not (get-text-property (match-beginning 0) 'face))))
+
+(ert-deftest shen-font-lock-numbers-and-variables ()
+  "Signed exponents and uppercase pattern variables receive faces."
+  (with-current-buffer (shen-test--buffer "(+ -12.5e-2 X) [@p _]")
+    (font-lock-mode 1)
+    (font-lock-fontify-buffer)
+    (dolist (case '(("-12.5e-2" . font-lock-constant-face)
+                    ("X" . font-lock-variable-name-face)
+                    ("_" . font-lock-constant-face)))
+      (goto-char (point-min))
+      (search-forward (car case))
+      (should (eq (get-text-property (match-beginning 0) 'face)
+                  (cdr case))))))
+
 (ert-run-tests-batch-and-exit)
 
 ;;; shen-mode-tests.el ends here

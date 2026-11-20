@@ -103,19 +103,18 @@ Backslash starts a comment: `\\\\' is a one-line comment and
 `\\\\*' a nestable block comment (the nestable flag goes on
 `*'; backslash itself carries the comment-start flag).  `|' is
 punctuation so a cons spanning lines does not glue its elements.
-The reader word characters from `misc?' in
-`kernel/sources/reader.shen' (`= - * / + _ ? $ ! @ ~ . > < & % ' #
-`') are word characters; backslash is not."
+Punctuation used inside Shen symbols, including `;', `:' and `,',
+is word syntax so matches cover an entire symbol."
   (let ((tbl (make-syntax-table)))
     (modify-syntax-entry ?\( "( " tbl)
     (modify-syntax-entry ?\) ")" tbl)
     (modify-syntax-entry ?\[ "(]" tbl)
     (modify-syntax-entry ?\] ")[ " tbl)
     (modify-syntax-entry ?\" "\"" tbl)
-    (dolist (c '(?\; ?\| ?\, ?\{ ?\} ?\:))
+    (dolist (c '(?\| ?\{ ?\}))
       (modify-syntax-entry c " " tbl))
     (dolist (c '(?\= ?\- ?\/ ?\+ ?\_ ?\? ?\$ ?\! ?\@ ?\~ ?\. ?\<
-                  ?\> ?\& ?\% ?\' ?\# ?\`))
+                  ?\> ?\& ?\% ?\' ?\# ?\` ?\; ?\: ?\,))
       (modify-syntax-entry c "w" tbl))
     (modify-syntax-entry ?\\ ". 124b" tbl)
     (modify-syntax-entry ?\* "w 23n" tbl)
@@ -124,17 +123,40 @@ The reader word characters from `misc?' in
 
 ;;;; Font lock
 
+(defun shen-mode--head-keyword-matcher (limit)
+  "Find a Shen form keyword before LIMIT, only in head position."
+  (let ((regexp (concat "\\_<" (regexp-opt
+                                (append shen-mode--top-level-keywords
+                                        shen-mode--special-forms
+                                        '("/."))) "\\_>"))
+        found)
+    (while (and (not found) (re-search-forward regexp limit t))
+      (let ((start (match-beginning 0)))
+        (when (and (not (nth 8 (save-excursion (syntax-ppss start))))
+                   (save-excursion
+                     (goto-char start)
+                     (skip-chars-backward " \t\n")
+                     (eq (char-before) ?\()))
+          (setq found t))))
+    found))
+
+(defun shen-mode--definition-matcher (limit)
+  "Find a definition name before LIMIT, including nested definitions."
+  (let ((regexp (concat "(\\s-*\\(?:"
+                        (regexp-opt shen-mode--def-words)
+                        "\\)\\s-+\\(\\w+\\)\\_>"))
+        found)
+    (while (and (not found) (re-search-forward regexp limit t))
+      (unless (nth 8 (save-excursion (syntax-ppss (match-beginning 0))))
+        (setq found t)))
+    found))
+
 (defun shen-mode--font-lock-keywords ()
   "Return the `font-lock-keywords' value for the current buffer."
   (list
-   ;; Top-level keywords.
-   (list (concat "\\_<" (regexp-opt shen-mode--top-level-keywords) "\\_>")
-         0 'font-lock-keyword-face)
-   ;; The name on a definition line, with or without a leading paren.
-   (list (concat "^[\\t ()]*\\(?:"
-                 (regexp-opt shen-mode--definition-keywords)
-                 "\\)\\s-+\\(\\w+\\)\\_>")
-         1 'font-lock-function-name-face)
+   ;; Form heads and names, including definitions nested in packages.
+   '(shen-mode--head-keyword-matcher 0 font-lock-keyword-face)
+   '(shen-mode--definition-matcher 1 font-lock-function-name-face)
    ;; Pattern arrows and the prolog clause arrow.
    (list (concat "\\_<\\(" (regexp-opt shen-mode--arrows) "\\)_>")
          1 'font-lock-constant-face)
@@ -143,13 +165,16 @@ The reader word characters from `misc?' in
    ;; Booleans.
    (list (concat "\\_<\\(" (regexp-opt shen-mode--booleans) "\\)_>")
          1 'font-lock-constant-face)
-   ;; Special forms.
-   (list (concat "\\_<\\(" (regexp-opt shen-mode--special-forms) "\\)_>")
-         1 'font-lock-builtin-face)
+   ;; Numeric literals, including signs, fractions and exponents.
+   '("\\_<[+-]*\\(?:[0-9]+\\(?:\\.[0-9]+\\)?\\|\\.[0-9]+\\)\\(?:[eE][+-]?[0-9]+\\)?\\_>"
+     0 font-lock-constant-face)
+   ;; Pattern variables and wildcard.
+   '("\\_<[A-Z]\\w*\\_>" 0 font-lock-variable-name-face)
+   '("\\_<_+\\_>" 0 font-lock-constant-face)
    ;; State variables: *name*.
-   (list "\\*\\w+\\*" 0 'font-lock-variable-face)
+   (list "\\*\\w+\\*" 0 'font-lock-variable-name-face)
    ;; Shen symbols: a leading @, a word, an optional trailing !
-   (list "@\\w+!?" 0 'font-lock-variable-face)
+   (list "@\\w+!?" 0 'font-lock-builtin-face)
    ;; The `|' cons separator, dimmed.
    (list "\\s-|\\s-" 0 'font-lock-constant-face)))
 
