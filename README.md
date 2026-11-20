@@ -43,6 +43,28 @@ make klambda SHEN=/path/to/shen
 
 ## Loading it with use-package
 
+For a VC install, allow this package's build command and translate the
+bundled KLambda sources during installation:
+
+```elisp
+(with-eval-after-load 'package-vc
+  (add-to-list 'package-vc-allow-build-commands 'shen-el))
+
+(use-package shen-el
+  :ensure nil
+  :vc (:url "https://github.com/echawk/shen-el"
+        :rev :newest
+        :lisp-dir "src/"
+        :make "translate")
+```
+
+The build command runs from the repository root and creates `compiled/`,
+which the launcher and in-process commands need.  Package VC compiles the
+Lisp files in `src/` during installation.  After changing an existing VC
+installation, reinstall or upgrade the package to run the build command.
+
+For a manual checkout, build it and add `src/` to your load path:
+
 ```elisp
 (use-package shen-el
   :load-path "~/src/shen-el/src"
@@ -58,7 +80,7 @@ time you use a command (`shen-elisp-boot`); this takes about 0.2 s.
 
 | Command | What it does |
 |---|---|
-| `M-x shen-repl` | Shen REPL in a comint buffer (runs `bin/shen repl`) |
+| `M-x shen-repl` | Shen REPL in a comint buffer (runs `bin/shen-el repl`) |
 | `M-x shen-elisp-eval-region` | Evaluate the region in this Emacs; result in the echo area |
 | `M-x shen-elisp-load-file` | `load` a `.shen` file into this Emacs |
 | `(shen-elisp-eval "(+ 1 2)")` | Evaluate a string from Lisp; returns the Shen value (here `3`) |

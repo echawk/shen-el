@@ -160,7 +160,7 @@ Shen relies on deep recursion; Emacs's default is far too small."
 
 ;;;; Interactive commands
 
-(defcustom shen-elisp-program (expand-file-name "bin/shen" shen-elisp-root)
+(defcustom shen-elisp-program (expand-file-name "bin/shen-el" shen-elisp-root)
   "Launcher used by `shen-repl'."
   :type 'file)
 
