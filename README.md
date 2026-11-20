@@ -1,7 +1,7 @@
 # Shen for Emacs Lisp
 
 [Shen](https://shenlanguage.org) running natively in GNU Emacs (29.1+).
-It currently tracks kernel **43.6**.
+It currently tracks kernel **43.7**.
 
 The KLambda kernel is compiled ahead of time into plain Emacs Lisp `defun`s.
 That code is then byte-compiled and, where Emacs supports it, native-compiled.
